@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 
 class ScanBarcodePage extends StatefulWidget {
   const ScanBarcodePage({super.key});
@@ -9,58 +9,55 @@ class ScanBarcodePage extends StatefulWidget {
 }
 
 class _ScanBarcodePageState extends State<ScanBarcodePage> {
-  bool scanned = false;
-  final MobileScannerController controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates, // lebih cepat deteksi
-    facing: CameraFacing.back,
-    torchEnabled: false,
-  );
+  String barcode = "";
+
+  Future<void> startScan() async {
+    try {
+      var result = await BarcodeScanner.scan(
+        options: ScanOptions(
+          useCamera: -1, // default camera belakang
+          autoEnableFlash: false,
+          android: AndroidOptions(
+            useAutoFocus: true,
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+
+      // Jika scan berhasil dan tidak cancel
+      if (result.type == ResultType.Barcode) {
+        setState(() {
+          barcode = result.rawContent;
+        });
+
+        // Kembali ke halaman sebelumnya dengan hasil scan
+        Navigator.pop(context, barcode);
+      }
+    } catch (e) {
+      // Handle error scan
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Scan failed: $e')),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startScan(); // langsung scan saat halaman dibuka
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Scan Barcode"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.flash_on),
-            onPressed: () => controller.toggleTorch(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.cameraswitch),
-            onPressed: () => controller.switchCamera(),
-          ),
-        ],
+        title: const Text('Scan Barcode'),
       ),
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: controller,
-            onDetect: (capture) {
-              if (scanned) return;
-
-              final barcodes = capture.barcodes;
-              if (barcodes.isEmpty) return;
-
-              final barcode = barcodes.first.rawValue;
-              if (barcode != null) {
-                scanned = true;
-                Navigator.pop(context, barcode);
-              }
-            },
-          ),
-          // Overlay kotak scan
-          Center(
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.green, width: 3),
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ],
+      body: Center(
+        child: barcode.isEmpty
+            ? const Text('Scanning...')
+            : Text('Scanned: $barcode'),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'add_product_page.dart';
+import 'product_detail_page.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -67,8 +68,25 @@ class _ListPageState extends State<ListPage> {
                                 fit: BoxFit.cover,
                               )
                             : const Icon(Icons.image),
+
                         title: Text(p["name"]),
                         subtitle: Text("Rp ${p['price']}"),
+
+                        // ============================
+                        //   ON TAP → BUKA DETAIL
+                        // ============================
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductDetailPage(productId: p["id"]),
+                            ),
+                          );
+
+                          if (result == true) {
+                            loadProducts(); // refresh list
+                          }
+                        },
 
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
@@ -76,6 +94,7 @@ class _ListPageState extends State<ListPage> {
                         ),
                       ),
                     );
+                    
                   },
                 ),
 
