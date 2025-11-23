@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kancil/pages/cart_page.dart';
 import 'package:kancil/pages/list_page.dart';
-import 'package:kancil/pages/home_page.dart';
+import 'package:kancil/pages/stock_in_out_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,18 +13,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'LoagApp',
       debugShowCheckedModeBanner: false,
-      home: const ListPage(),
+      home: const MainPage(),
     );
   }
 }
 
 
 class MainPage extends StatefulWidget {
-  final String userId;
 
-  const MainPage({super.key, required this.userId});
+
+  const MainPage({super.key});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -33,11 +33,20 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
 
+  void _goToListPage() {
+  setState(() {
+    _selectedIndex = 0;
+  });
+}
+
+
 @override
 void initState() {
   super.initState();
   _pages = [
     ListPage(),
+    StockInOutPage(onSuccess: _goToListPage),
+    CartPage(),
   ];
 }
 
@@ -62,7 +71,15 @@ void initState() {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
-            label: 'Barang',
+            label: 'List barang',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_search),
+            label: 'Masuk/Keluar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'keranjang',
           ),
         ],
       ),

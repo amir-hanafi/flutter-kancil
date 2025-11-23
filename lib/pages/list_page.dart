@@ -12,8 +12,10 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> _allProducts = [];
+  List<Map<String, dynamic>> _filteredProducts = [];
   bool isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -24,14 +26,24 @@ class _ListPageState extends State<ListPage> {
   Future<void> loadProducts() async {
     final data = await DBHelper.getProducts();
     setState(() {
-      products = data;
+      _allProducts = data;
+      _filteredProducts = List.from(_allProducts); // untuk search
       isLoading = false;
     });
   }
 
-  Future<void> _delete(int id) async {
-    await DBHelper.deleteProduct(id);
-    loadProducts();
+  void _filterProducts(String query) {
+    if (query.isEmpty) {
+      _filteredProducts = List.from(_allProducts);
+    } else {
+      _filteredProducts = _allProducts
+          .where((p) => p['name']
+              .toString()
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    }
+    setState(() {});
   }
 
   Future<void> _goToAddPage() async {
@@ -50,53 +62,61 @@ class _ListPageState extends State<ListPage> {
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : products.isEmpty
-              ? const Center(child: Text("Belum ada produk"))
-              : ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (_, index) {
-                    final p = products[index];
-
-                    return Card(
-                      margin: const EdgeInsets.all(12),
-                      child: ListTile(
-                        leading: p["image"] != null
-                            ? Image.file(
-                                File(p["image"]),
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(Icons.image),
-
-                        title: Text(p["name"]),
-                        subtitle: Text("Rp ${p['price']}"),
-
-                        // ============================
-                        //   ON TAP → BUKA DETAIL
-                        // ============================
-                        onTap: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProductDetailPage(productId: p["id"]),
-                            ),
-                          );
-
-                          if (result == true) {
-                            loadProducts(); // refresh list
-                          }
-                        },
-
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _delete(p["id"]),
-                        ),
-                      ),
-                    );
-                    
-                  },
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      labelText: "Cari Produk",
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: _filterProducts,
+                  ),
                 ),
+                Expanded(
+                  child: _filteredProducts.isEmpty
+                      ? const Center(child: Text("Belum ada produk"))
+                      : ListView.builder(
+                          itemCount: _filteredProducts.length,
+                          itemBuilder: (_, index) {
+                            final p = _filteredProducts[index];
+
+                            return Card(
+                              margin: const EdgeInsets.all(8),
+                              child: ListTile(
+                                leading: p["image"] != null
+                                    ? Image.file(
+                                        File(p["image"]),
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Icon(Icons.image),
+                                title: Text(p["name"]),
+                                subtitle: Text("Rp ${p['price']}"),
+                                onTap: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          ProductDetailPage(productId: p["id"]),
+                                    ),
+                                  );
+
+                                  if (result == true) {
+                                    loadProducts();
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: _goToAddPage,
