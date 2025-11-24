@@ -21,10 +21,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/iconapp.png
+    - assets/logoapp.png
     - assets/fonts/Noto_Sans/
   fonts:
     - family: NotoSans
@@ -32,3 +36,12 @@ flutter:
         - asset: assets/fonts/Noto_Sans/NotoSans-VariableFont_wdth,wght.ttf
         - asset: assets/fonts/Noto_Sans/NotoSans-Italic-VariableFont_wdth,wght.ttf
           style: italic
+
+flutter_icons:
+  android: true
+  image_path: "assets/iconapp.png"
+
+flutter_native_splash:
+  color: "#ffffff"        # Background splash
+  image: assets/logoapp.png # Logo di tengah
+  android: true

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
+import 'out_of_stock_page.dart';
 
 class StockInOutPage extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -154,7 +155,23 @@ class _StockInOutPageState extends State<StockInOutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Barang Masuk / Keluar")),
+      appBar: AppBar(
+        title: const Text("Masuk / Kurangi Stok"),
+        actions: [
+            IconButton(
+              icon: const Icon(Icons.warning_amber), // icon yang mau ditampilkan
+              onPressed: () {
+                // aksi saat icon ditekan, misal pindah halaman
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OutOfStockPage(), // ganti dengan halaman tujuan
+                  ),
+                );
+              }, // optional, muncul saat hover/long press
+            ),
+          ],
+        ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

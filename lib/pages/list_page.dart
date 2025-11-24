@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
+import 'package:kancil/pages/out_of_stock_page.dart';
 import 'add_product_page.dart';
-import 'product_detail_page.dart';
+import 'product_detail_page.dart';  
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -58,7 +59,10 @@ class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Daftar Produk")),
+      appBar: AppBar(
+        title: const Text("Daftar Produk"),
+        
+        ),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())

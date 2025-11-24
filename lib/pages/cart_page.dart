@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/scan_barcode_page.dart';
+import 'package:kancil/pages/transaction_history_page.dart';
+import 'payment_page.dart';
+import 'qr_settings.dart';
 
 class CartItem {
   final int productId;
@@ -139,7 +142,41 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Keranjang")),
+      appBar: AppBar(
+        title: const Text("Keranjang"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), // icon bisa diganti sesuai selera
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Menu"),
+                  content: const Text("Pilih aksi:"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TransactionHistoryPage(
+                          ),
+                        ),
+                      );
+                    },
+                      child: const Text("Riwayat Transaksi"),
+                    ),
+                    TextButton(
+                      onPressed: () => showQRSettingsPopup(context),
+                      child: const Text("Atur QR Pembayaran"),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+        ),
       body: Column(
         children: [
           // SEARCH + SCAN
@@ -233,13 +270,19 @@ class _CartPageState extends State<CartPage> {
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, "/payment", arguments: {
-                        "cart": cart,
-                        "total": totalPrice,
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PaymentPage(
+                            cart: cart,      // List<CartItem>
+                            total: totalPrice, // int
+                          ),
+                        ),
+                      );
                     },
                     child: const Text("Selesaikan Transaksi"),
                   ),
+
                 ],
               ),
             ),
