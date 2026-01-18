@@ -103,26 +103,7 @@ class _PaymentPageState extends State<PaymentPage> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            const Text("Scan QR berikut untuk membayar:"),
-            const SizedBox(height: 10),
-            // Tampilkan gambar QR dari assets
-            FutureBuilder<String?>(
-              future: QRSettings.getQRPath(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
-
-                if (!snapshot.hasData || snapshot.data == null) {
-                  return const Text("QR belum diatur");
-                }
-
-                final path = snapshot.data!;
-                return kIsWeb
-                    ? Image.network(path, width: 200, height: 200)
-                    : Image.file(File(path), width: 200, height: 200);
-              },
-            ),
+            
             const SizedBox(height: 20),
             _processing
                 ? const CircularProgressIndicator()

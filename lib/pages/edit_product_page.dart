@@ -180,16 +180,44 @@ class _EditProductPageState extends State<EditProductPage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // gambar & pick
-          Center(child: _imagePreview()),
-          const SizedBox(height: 8),
-          Center(
-            child: ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.image),
-              label: const Text("Ganti Gambar"),
-            ),
+          GestureDetector(
+  onTap: _pickImage,
+  child: Container(
+    width: double.infinity,
+    height: 200,
+    decoration: BoxDecoration(
+      color: Colors.grey.shade200,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade400),
+    ),
+    child: _imageFile != null
+    ? ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: kIsWeb
+            ? Image.network(
+                _imageFile!.path,
+                fit: BoxFit.cover,
+              )
+            : Image.file(
+                File(_imageFile!.path),
+                fit: BoxFit.cover,
+              ),
+      )
+    : Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.camera_alt, size: 40, color: Colors.grey),
+          SizedBox(height: 6),
+          Text(
+            "Tap untuk memilih gambar",
+            style: TextStyle(color: Colors.grey),
           ),
+        ],
+      ),
+
+  ),
+),
+
 
           const SizedBox(height: 16),
 

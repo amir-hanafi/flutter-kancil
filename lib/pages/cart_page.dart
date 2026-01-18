@@ -166,10 +166,7 @@ class _CartPageState extends State<CartPage> {
                     },
                       child: const Text("Riwayat Transaksi"),
                     ),
-                    TextButton(
-                      onPressed: () => showQRSettingsPopup(context),
-                      child: const Text("Atur QR Pembayaran"),
-                    ),
+
                   ],
                 ),
               );
@@ -226,66 +223,80 @@ class _CartPageState extends State<CartPage> {
           ),
 
           // CART
-          if (cart.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey[100],
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: cart.length,
-                    itemBuilder: (context, index) {
-                      final item = cart[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(item.name),
-                          subtitle: Text(
-                              "Rp ${item.price} • ${item.type} • Qty: ${item.qty}"),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: () => decreaseQty(index),
-                                icon: const Icon(Icons.remove),
-                              ),
-                              Text("${item.qty}"),
-                              IconButton(
-                                onPressed: () => increaseQty(index),
-                                icon: const Icon(Icons.add),
-                              ),
-                            ],
-                          ),
+          // CART
+if (cart.isNotEmpty)
+  SizedBox(
+    height: 260, // ✅ tinggi tetap (silakan sesuaikan: 220 - 320 dll)
+    child: Container(
+      padding: const EdgeInsets.all(12),
+      color: Colors.grey[100],
+      child: Column(
+        children: [
+          // LIST CART (SCROLL)
+          Expanded(
+            child: ListView.builder(
+              itemCount: cart.length,
+              itemBuilder: (context, index) {
+                final item = cart[index];
+                return Card(
+                  child: ListTile(
+                    title: Text(item.name),
+                    subtitle: Text(
+                      "Rp ${item.price} • ${item.type} • Qty: ${item.qty}",
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => decreaseQty(index),
+                          icon: const Icon(Icons.remove),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Total: Rp $totalPrice",
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PaymentPage(
-                            cart: cart,      // List<CartItem>
-                            total: totalPrice, // int
-                          ),
+                        Text("${item.qty}"),
+                        IconButton(
+                          onPressed: () => increaseQty(index),
+                          icon: const Icon(Icons.add),
                         ),
-                      );
-                    },
-                    child: const Text("Selesaikan Transaksi"),
+                      ],
+                    ),
                   ),
-
-                ],
-              ),
+                );
+              },
             ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // TOTAL
+          Text(
+            "Total: Rp $totalPrice",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 8),
+
+          // BUTTON
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PaymentPage(
+                      cart: cart,
+                      total: totalPrice,
+                    ),
+                  ),
+                );
+              },
+              child: const Text("Selesaikan Transaksi"),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+
         ],
       ),
     );
