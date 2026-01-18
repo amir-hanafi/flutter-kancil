@@ -61,6 +61,20 @@ class _ListPageState extends State<ListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Daftar Produk"),
+        actions: [
+            IconButton(
+              icon: const Icon(Icons.warning_amber), // icon yang mau ditampilkan
+              onPressed: () {
+                // aksi saat icon ditekan, misal pindah halaman
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OutOfStockPage(), // ganti dengan halaman tujuan
+                  ),
+                );
+              }, // optional, muncul saat hover/long press
+            ),
+          ],
         
         ),
 

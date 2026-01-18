@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kancil/pages/cart_page.dart';
-import 'package:kancil/pages/list_page.dart';
-import 'package:kancil/pages/stock_in_out_page.dart';
+import 'package:kancil/pages/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -44,8 +43,7 @@ class _MainPageState extends State<MainPage> {
 void initState() {
   super.initState();
   _pages = [
-    ListPage(),
-    StockInOutPage(onSuccess: _goToListPage),
+    HomePage(),
     CartPage(),
   ];
 }
@@ -70,12 +68,8 @@ void initState() {
         type: BottomNavigationBarType.fixed, // agar 3+ item bisa tampil
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'List barang',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.manage_search),
-            label: 'Masuk/Keluar',
+            icon: Icon(Icons.home),
+            label: 'beranda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),

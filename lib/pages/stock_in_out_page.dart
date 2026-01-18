@@ -157,20 +157,7 @@ class _StockInOutPageState extends State<StockInOutPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Masuk / Kurangi Stok"),
-        actions: [
-            IconButton(
-              icon: const Icon(Icons.warning_amber), // icon yang mau ditampilkan
-              onPressed: () {
-                // aksi saat icon ditekan, misal pindah halaman
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const OutOfStockPage(), // ganti dengan halaman tujuan
-                  ),
-                );
-              }, // optional, muncul saat hover/long press
-            ),
-          ],
+        
         ),
       body: Padding(
         padding: const EdgeInsets.all(20),
