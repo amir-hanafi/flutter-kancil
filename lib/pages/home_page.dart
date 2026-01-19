@@ -46,6 +46,8 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
+          const SizedBox(height: 30),
+
           // ====== ISI BERANDA (SCROLL) ======
           Expanded(
             child: SingleChildScrollView(
@@ -71,7 +73,9 @@ class HomePage extends StatelessWidget {
                     child: const Center(child: Text("Area grafik / banner")),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 50),
+                  const Divider(),
+                  const SizedBox(height: 30),
 
                   const Text(
                     "Produk ditambahkan / dikeluarkan",
@@ -89,6 +93,8 @@ class HomePage extends StatelessWidget {
                     ),
                     child: const Center(child: Text("Area konten beranda")),
                   ),
+
+                  const SizedBox(height: 30),
 
                   const Text(
                     "Stok Produk yang kosong",

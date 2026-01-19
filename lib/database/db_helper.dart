@@ -13,7 +13,7 @@ class DBHelper {
 
     _db = await openDatabase(
       path,
-      version: 3, // update ke versi 3 untuk transaksi
+      version: 4, // update ke versi 3 untuk transaksi
       onCreate: (db, version) async {
         // TABLE PRODUCTS
         await db.execute("""
@@ -52,6 +52,16 @@ class DBHelper {
             price INTEGER NOT NULL
           );
         """);
+
+        await db.execute("""
+        CREATE TABLE store_profile (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT,
+          address TEXT,
+          phone TEXT,
+          logo TEXT
+        );
+        """);
       },
 
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -82,7 +92,21 @@ class DBHelper {
               price INTEGER NOT NULL
             );
           """);
+          
         }
+
+        if (oldVersion < 4) {
+          await db.execute("""
+          CREATE TABLE store_profile (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            address TEXT,
+            phone TEXT,
+            logo TEXT
+          );
+          """);
+        }
+
       },
     );
 
@@ -168,4 +192,30 @@ class DBHelper {
     final db = await database();
     return await db.query("transaction_items", where: "transaction_id = ?", whereArgs: [transactionId]);
   }
+
+  // ================== STORE PROFILE ==================
+
+  static Future<Map<String, dynamic>?> getStoreProfile() async {
+  final db = await database();
+  final res = await db.query("store_profile", limit: 1);
+  return res.isNotEmpty ? res.first : null;
+}
+
+static Future<void> saveStoreProfile(Map<String, dynamic> data) async {
+  final db = await database();
+  final res = await db.query("store_profile", limit: 1);
+
+  if (res.isEmpty) {
+    await db.insert("store_profile", data);
+  } else {
+    await db.update(
+      "store_profile",
+      data,
+      where: "id = ?",
+      whereArgs: [res.first['id']],
+    );
+  }
+}
+
+
 }

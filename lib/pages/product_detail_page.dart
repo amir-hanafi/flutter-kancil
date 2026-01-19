@@ -123,53 +123,57 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) async {
-              if (value == 'edit') {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditProductPage(productId: product!['id']),
-                  ),
-                );
-
-                if (!mounted) return;
-                if (result == true) {
-                  await loadData();
-                }
-              } else if (value == 'delete') {
-  if (isParent && childProducts.isNotEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Hapus child terlebih dahulu sebelum menghapus parent.')),
+  if (value == 'edit') {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditProductPage(productId: product!['id']),
+      ),
     );
-    return;
+
+    if (!mounted) return;
+    if (result == true) {
+      await loadData();
+    }
+
+  } else if (value == 'delete') {
+    if (isParent && childProducts.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Hapus child terlebih dahulu sebelum menghapus parent.')),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Hapus Produk"),
+        content: const Text("Yakin ingin menghapus produk ini?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Batal"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Hapus"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    await DBHelper.deleteProduct(product!['id'] as int);
+    if (!mounted) return;
+    Navigator.pop(context, true);
+
+  } else if (value == 'stock') {
+    _showStockDialog(); // ✅ INI YANG KURANG
   }
+},
 
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Hapus Produk"),
-      content: const Text("Yakin ingin menghapus produk ini? Tindakan ini tidak bisa dibatalkan."),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text("Batal"),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text("Hapus"),
-        ),
-      ],
-    ),
-  );
-
-  if (confirm != true) return;
-
-  await DBHelper.deleteProduct(product!['id'] as int);
-  if (!mounted) return;
-  Navigator.pop(context, true);
-}
-
-            },
             itemBuilder: (context) => const [
               PopupMenuItem(value: 'edit', child: Text('Edit')),
               PopupMenuItem(value: 'delete', child: Text('Hapus')),
