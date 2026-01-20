@@ -32,6 +32,40 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
 
+  Widget _buildNavItem({
+  required IconData icon,
+  required String label,
+  required int index,
+}) {
+  final bool isActive = _selectedIndex == index;
+
+  return Expanded(
+    child: InkWell(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 22,
+            color: isActive ? Colors.green : Colors.grey,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: isActive ? Colors.green : Colors.grey,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -71,28 +105,45 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'beranda',
+  body: _pages[_selectedIndex],
+
+  floatingActionButton: FloatingActionButton(
+    backgroundColor: Colors.green,
+    elevation: 4,
+    onPressed: () {
+      _onItemTapped(1); // Cart
+    },
+    child: const Icon(Icons.shopping_cart, color: Colors.white, size: 24),
+  ),
+  floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+
+  bottomNavigationBar: BottomAppBar(
+    shape: const CircularNotchedRectangle(),
+    notchMargin: 6,
+    child: SizedBox(
+      height: 55, // lebih pendek dari default
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildNavItem(
+            icon: Icons.home,
+            label: "Beranda",
+            index: 0,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'keranjang',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.more_vert),
-            label: 'lainnya',
+
+          const SizedBox(width: 50), // ruang untuk FAB
+
+          _buildNavItem(
+            icon: Icons.more_vert,
+            label: "Lainnya",
+            index: 2,
           ),
         ],
       ),
-    );
+    ),
+  ),
+);
+
+
   }
 }

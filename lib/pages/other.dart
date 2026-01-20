@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/edit_profile_page.dart';
 import 'package:kancil/pages/product_data_page.dart';
+import 'package:kancil/pages/transaction_data_page.dart';
 
 
 class OtherPage extends StatefulWidget {
@@ -139,22 +140,33 @@ class _OtherPageState extends State<OtherPage> {
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text("Data produk"),
+                    child: const Text("Data Produk"),
                   ),
                 ),
 
 
                   const SizedBox(height: 10),
 
-                  Container(
+                  InkWell(
+                  onTap: () {
+                    // Navigasi ke halaman product_data.dart
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TransactionDataPage(), // pastikan nama class sesuai
+                      ),
+                    );
+                  },
+                  child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text("Data transaksi"),
+                    child: const Text("Data Transaksi"),
                   ),
+                ),
                 ],
               ),
             ),
