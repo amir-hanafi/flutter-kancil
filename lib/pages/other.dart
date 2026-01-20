@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
+import 'package:kancil/pages/edit_profile_page.dart';
 
 class OtherPage extends StatefulWidget {
   const OtherPage({super.key});
@@ -28,7 +29,25 @@ class _OtherPageState extends State<OtherPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Row(
+          children: [
+            Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            IconButton(
+              icon: const Icon(Icons.edit, size: 12,),
+              onPressed: () async {
+                final res = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfilePage()),
+                );
+
+                if (res == true) {
+                  _loadStore(); // fungsi refresh profil di OtherPage
+                }
+              },
+            ),
+
+          ],
+        ),
         const SizedBox(height: 6),
         Container(
           width: double.infinity,
