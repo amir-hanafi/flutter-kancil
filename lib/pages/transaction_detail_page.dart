@@ -54,7 +54,7 @@ class TransactionDetailPage extends StatelessWidget {
 
             if (isRefund)
               const Text(
-                "STATUS: REFUND",
+                "STATUS: Hasil Refund",
                 style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
 

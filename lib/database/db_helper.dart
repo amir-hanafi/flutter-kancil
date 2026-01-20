@@ -280,31 +280,32 @@ class DBHelper {
   }
 
   static Future<int> insertRefundTransaction(
-    int fromTransactionId,
-    int total,
-    List<Map<String, dynamic>> items,
-  ) async {
-    final db = await database();
+  int fromTransactionId,
+  int total,
+  List<Map<String, dynamic>> items,
+) async {
+  final db = await database();
 
-    final refundId = await db.insert("transactions", {
-      "total": -total, // minus
-      "date": DateTime.now().toIso8601String(),
-      "is_refund": 1,
-      "refund_from": fromTransactionId,
+  final newId = await db.insert("transactions", {
+    "total": total, // ✅ TOTAL BARU (SISA)
+    "date": DateTime.now().toIso8601String(),
+    "is_refund": 1,
+    "refund_from": fromTransactionId,
+  });
+
+  for (var item in items) {
+    await db.insert("transaction_items", {
+      "transaction_id": newId,
+      "product_id": item['productId'],
+      "name": item['name'],
+      "type": item['type'],
+      "qty": item['qty'],
+      "price": item['price'],
     });
-
-    for (var item in items) {
-      await db.insert("transaction_items", {
-        "transaction_id": refundId,
-        "product_id": item['productId'],
-        "name": item['name'],
-        "type": "refund",
-        "qty": item['qty'],
-        "price": item['price'],
-      });
-    }
-
-    return refundId;
   }
+
+  return newId;
+}
+
 
 }

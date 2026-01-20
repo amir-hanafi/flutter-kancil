@@ -49,24 +49,24 @@ class _RefundPageState extends State<RefundPage> {
 
 
   Future<void> _processRefund() async {
-    int refundTotal = 0;
-    List<Map<String, dynamic>> refundItems = [];
+  List<Map<String, dynamic>> refundItems = [];
+  List<Map<String, dynamic>> remainingItems = [];
 
-    // ================= LOOP ITEM =================
-    for (var item in items) {
-      int qty = (item['refund_qty'] ?? 0);
+  // ================= LOOP ITEM =================
+  for (var item in items) {
+    int refundQty = (item['refund_qty'] ?? 0);
+    int originalQty = (item['qty'] as num).toInt();
+    int leftQty = originalQty - refundQty;
 
-      if (qty <= 0) continue;
+    final productId = (item['product_id'] as num).toInt();
+    final price = (item['price'] as num).toInt();
 
-      final productId = (item['product_id'] as num).toInt();
-      final price = (item['price'] as num).toInt();
-
-      refundTotal += price * qty;
-
+    // ===== refund items (hanya untuk stok & validasi) =====
+    if (refundQty > 0) {
       refundItems.add({
         "productId": productId,
         "name": item['name'],
-        "qty": qty,
+        "qty": refundQty,
         "price": price,
       });
 
@@ -75,38 +75,55 @@ class _RefundPageState extends State<RefundPage> {
         final product = await DBHelper.getProductById(productId);
         if (product != null) {
           int currentStock = (product['stock_qty'] ?? 0);
-          await DBHelper.updateStock(productId, currentStock + qty);
+          await DBHelper.updateStock(productId, currentStock + refundQty);
         }
       }
     }
 
-    if (refundItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Pilih minimal 1 barang untuk refund")),
-      );
-      return;
+    // ===== remaining items (INI yang jadi transaksi baru) =====
+    if (leftQty > 0) {
+      remainingItems.add({
+        "productId": productId,
+        "name": item['name'],
+        "qty": leftQty,
+        "price": price,
+        "type": item['type'],
+      });
     }
-
-    // ================= TANDAI TRANSAKSI LAMA =================
-    await DBHelper.markTransactionRefund(
-      widget.transactionId,
-    );
-
-    // ================= BUAT TRANSAKSI REFUND BARU =================
-    await DBHelper.insertRefundTransaction(
-      widget.transactionId,
-      refundTotal,
-      refundItems,
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Refund berhasil diproses")),
-    );
-
-    Navigator.pop(context, true);
   }
+
+  if (refundItems.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Pilih minimal 1 barang untuk refund")),
+    );
+    return;
+  }
+
+  // ================= HITUNG TOTAL BARU =================
+  int newTotal = 0;
+  for (var item in remainingItems) {
+    newTotal += (item['price'] as int) * (item['qty'] as int);
+  }
+
+  // ================= TANDAI TRANSAKSI LAMA =================
+  await DBHelper.markTransactionRefund(widget.transactionId);
+
+  // ================= BUAT TRANSAKSI BARU (SISA) =================
+  await DBHelper.insertRefundTransaction(
+    widget.transactionId,
+    newTotal,
+    remainingItems,
+  );
+
+  if (!mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text("Refund berhasil diproses")),
+  );
+
+  Navigator.pop(context, true);
+}
+
 
 
   @override

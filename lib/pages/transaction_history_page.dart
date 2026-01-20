@@ -45,13 +45,12 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                   itemBuilder: (context, index) {
                     final tx = _transactions[index];
                     final bool isRefund = (tx['is_refund'] ?? 0) == 1;
-                    final bool isFromRefund = tx['refund_from'] != null;
+                    final bool isRefundEntry = isRefund && tx['refund_from'] != null;
+                    final bool isOldRefundedTransaction = isRefund && tx['refund_from'] == null;
 
                     String title;
-                    if (isRefund && isFromRefund) {
+                    if (isRefundEntry) {
                       title = "Refund #${tx['id']} (dari #${tx['refund_from']})";
-                    } else if (isRefund) {
-                      title = "Transaksi #${tx['id']} (REFUND)";
                     } else {
                       title = "Transaksi #${tx['id']}";
                     }
@@ -63,22 +62,29 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
                           title,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            decoration:
-                                (!isFromRefund && isRefund) ? TextDecoration.lineThrough : null,
-                            color: (!isFromRefund && isRefund) ? Colors.grey : null,
+                            decoration: isOldRefundedTransaction ? TextDecoration.lineThrough : null,
+                            color: isOldRefundedTransaction ? Colors.grey : null,
+
                           ),
                         ),
                         subtitle: Text(tx['date']),
-                        trailing: isRefund
-                            ? const Text(
-                                "REFUND",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : Text("Rp ${tx['total']}"),
-                        onTap: isFromRefund
+                        trailing: isOldRefundedTransaction
+                      ? const Text(
+                          "REFUND",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : Text(
+                          "Rp ${tx['total']}",
+                          style: TextStyle(
+                            color: isRefundEntry ? Colors.red : null,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+
+                        onTap: isOldRefundedTransaction
                             ? null
                             : () async {
                                 final db = await DBHelper.database();
