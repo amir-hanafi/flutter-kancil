@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/list_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,118 +8,191 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Beranda"),
-      ),
-
-      body: Column(
-        children: [
-
-          // ====== "SEARCH BAR" PALSU (BUTTON) ======
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ListPage()),
+      backgroundColor: const Color(0xffF6F7FB),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ===== HEADER TOKO =====
+            FutureBuilder<Map<String, dynamic>?>(
+              future: DBHelper.getStoreProfile(),
+              builder: (context, snapshot) {
+                final storeName = snapshot.data?['name'] ?? "Toko Saya";
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            storeName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            "Kelola stok & penjualan",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Colors.green.shade100,
+                        child: const Icon(Icons.store, color: Colors.green),
+                      ),
+                    ],
+                  ),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade400),
+            ),
+
+            // ===== TOMBOL KE LIST PAGE (BUKAN SEARCHBAR) =====
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ListPage()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.assignment, color: Colors.green),
+                      SizedBox(width: 8),
+                      Text(
+                        "Lihat daftar produk...",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.assignment, color: Colors.grey),
-                    SizedBox(width: 8),
-                    Text(
-                      "Lihat produk...",
-                      style: TextStyle(color: Colors.grey),
-                    )
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // ===== ISI BERANDA =====
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // ===== BANNER =====
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Container(
+                        height: 160,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.green.shade400,
+                              Colors.green.shade600,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.green.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: const [
+                              Expanded(
+                                child: Text(
+                                  "Kelola stok lebih cepat dan rapi\nlangsung dari genggamanmu",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Icon(Icons.inventory_2, size: 60, color: Colors.white),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          const SizedBox(height: 30),
-
-          // ====== ISI BERANDA (SCROLL) ======
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  const Text(
-                    "Produk terlaris bulan ini",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Container(
-                    height: 180,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(child: Text("Area grafik / banner")),
-                  ),
-
-                  const SizedBox(height: 50),
-                  const Divider(),
-                  const SizedBox(height: 30),
-
-                  const Text(
-                    "Produk ditambahkan / dikeluarkan",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(child: Text("Area konten beranda")),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  const Text(
-                    "Stok Produk yang kosong",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(child: Text("Area konten beranda")),
-                  ),
-
-                  // 👉 nanti kalau kamu mau tambah banyak widget, tinggal tambah di sini
-                ],
-              ),
+  // ===== WIDGET SECTION =====
+  Widget _buildSection(String title, Widget child) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
+          const SizedBox(height: 10),
+          child,
         ],
+      ),
+    );
+  }
+
+  // ===== CARD PLACEHOLDER =====
+  Widget _buildCardPlaceholder(String text, double height) {
+    return Container(
+      height: height,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.grey),
+        ),
       ),
     );
   }

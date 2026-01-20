@@ -1,11 +1,9 @@
-// lib/pages/other.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/edit_profile_page.dart';
 import 'package:kancil/pages/product_data_page.dart';
 import 'package:kancil/pages/transaction_data_page.dart';
-
 
 class OtherPage extends StatefulWidget {
   const OtherPage({super.key});
@@ -28,145 +26,182 @@ class _OtherPageState extends State<OtherPage> {
     setState(() {});
   }
 
-  Widget _infoBox(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            IconButton(
-              icon: const Icon(Icons.edit, size: 12,),
-              onPressed: () async {
-                final res = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EditProfilePage()),
-                );
-
-                if (res == true) {
-                  _loadStore(); // fungsi refresh profil di OtherPage
-                }
-              },
+  Widget _menuItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-
           ],
         ),
-        const SizedBox(height: 6),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(value.isEmpty ? "-" : value),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.green),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(fontSize: 15),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
         ),
-      ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final name = store?['name'] ?? "";
-    final address = store?['address'] ?? "";
-    final phone = store?['phone'] ?? "";
+    final name = store?['name'] ?? "Nama Toko";
+    final address = store?['address'] ?? "-";
+    final phone = store?['phone'] ?? "-";
     final logo = store?['logo'];
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Column(
           children: [
-
-            // HEADER
+            // HEADER HIJAU
             Container(
-              height: 120,
-              color: Colors.cyanAccent,
-            ),
-
-            const SizedBox(height: 20),
-
-            // FOTO TOKO
-            Container(
-              width: 110,
-              height: 110,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.shade300,
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
               ),
-              child: ClipOval(
-                child: logo != null && logo.toString().isNotEmpty
-                    ? Image.file(File(logo), fit: BoxFit.cover)
-                    : const Icon(Icons.store, size: 60, color: Colors.grey),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  _infoBox("Nama toko", name),
-                  const SizedBox(height: 14),
-                  _infoBox("Alamat toko", address),
-                  const SizedBox(height: 14),
-                  _infoBox("Nomor telepon", phone),
-
-                  const SizedBox(height: 24),
-                  const Divider(),
-
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Pengaturan",
-                        style: TextStyle(fontWeight: FontWeight.w600)),
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: ClipOval(
+                      child: logo != null && logo.toString().isNotEmpty
+                          ? Image.file(File(logo), fit: BoxFit.cover)
+                          : const Icon(Icons.store, size: 45, color: Colors.green),
+                    ),
                   ),
-
                   const SizedBox(height: 12),
-
-                  InkWell(
-                  onTap: () {
-                    // Navigasi ke halaman product_data.dart
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProductDataPage(), // pastikan nama class sesuai
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(10),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: const Text("Data Produk"),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    phone,
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
 
+            const SizedBox(height: 20),
 
-                  const SizedBox(height: 10),
-
-                  InkWell(
-                  onTap: () {
-                    // Navigasi ke halaman product_data.dart
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TransactionDataPage(), // pastikan nama class sesuai
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(10),
+            // CARD INFO TOKO
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
-                    child: const Text("Data Transaksi"),
-                  ),
+                  ],
                 ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "Informasi Toko",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.edit, size: 20),
+                          onPressed: () async {
+                            final res = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const EditProfilePage()),
+                            );
+                            if (res == true) _loadStore();
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text("Alamat: $address",
+                        style: const TextStyle(color: Colors.grey)),
+                    const SizedBox(height: 6),
+                    Text("Telepon: $phone",
+                        style: const TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // MENU LIST
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _menuItem(
+                    icon: Icons.inventory_2,
+                    title: "Data Produk",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ProductDataPage()),
+                      );
+                    },
+                  ),
+                  _menuItem(
+                    icon: Icons.receipt_long,
+                    title: "Data Transaksi",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const TransactionDataPage()),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
