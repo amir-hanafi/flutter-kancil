@@ -1,13 +1,18 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/edit_product_page.dart';
+
 import 'stock_in_out_sheet.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final int productId;
 
-  const ProductDetailPage({super.key, required this.productId});
+  const ProductDetailPage({
+    super.key,
+    required this.productId,
+  });
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
@@ -108,12 +113,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     int totalChildStock = 0;
     for (var c in childProducts) {
       final raw = c['stock_qty'] ?? 0;
-      totalChildStock += (raw is num) ? raw.toInt() : int.parse(raw.toString());
+      totalChildStock +=
+          (raw is num) ? raw.toInt() : int.parse(raw.toString());
     }
 
     final packSizeRaw = product!['pack_size'] ?? 1;
-    final int packSize =
-        (packSizeRaw is num) ? packSizeRaw.toInt() : int.parse(packSizeRaw.toString());
+    final int packSize = (packSizeRaw is num)
+        ? packSizeRaw.toInt()
+        : int.parse(packSizeRaw.toString());
 
     final int totalPack =
         isParent ? (packSize > 0 ? (totalChildStock ~/ packSize) : 0) : 0;
@@ -123,69 +130,74 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) async {
-  if (value == 'edit') {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => EditProductPage(productId: product!['id']),
-      ),
-    );
+              if (value == 'edit') {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        EditProductPage(productId: product!['id']),
+                  ),
+                );
 
-    if (!mounted) return;
-    if (result == true) {
-      await loadData();
-    }
+                if (!mounted) return;
+                if (result == true) {
+                  await loadData();
+                }
+              } else if (value == 'delete') {
+                if (isParent && childProducts.isNotEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Hapus child terlebih dahulu sebelum menghapus parent.',
+                      ),
+                    ),
+                  );
+                  return;
+                }
 
-  } else if (value == 'delete') {
-    if (isParent && childProducts.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hapus child terlebih dahulu sebelum menghapus parent.')),
-      );
-      return;
-    }
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Hapus Produk"),
+                    content: const Text("Yakin ingin menghapus produk ini?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text("Batal"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text("Hapus"),
+                      ),
+                    ],
+                  ),
+                );
 
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Hapus Produk"),
-        content: const Text("Yakin ingin menghapus produk ini?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Batal"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus"),
-          ),
-        ],
-      ),
-    );
+                if (confirm != true) return;
 
-    if (confirm != true) return;
-
-    await DBHelper.deleteProduct(product!['id'] as int);
-    if (!mounted) return;
-    Navigator.pop(context, true);
-
-  } else if (value == 'stock') {
-    _showStockDialog(); // ✅ INI YANG KURANG
-  }
-},
-
+                await DBHelper.deleteProduct(product!['id'] as int);
+                if (!mounted) return;
+                Navigator.pop(context, true);
+              } else if (value == 'stock') {
+                _showStockDialog();
+              }
+            },
             itemBuilder: (context) => const [
               PopupMenuItem(value: 'edit', child: Text('Edit')),
               PopupMenuItem(value: 'delete', child: Text('Hapus')),
-              PopupMenuItem(value: 'stock', child: Text('Masuk / Kurangi Stok')),
+              PopupMenuItem(
+                value: 'stock',
+                child: Text('Masuk / Kurangi Stok'),
+              ),
             ],
           )
         ],
       ),
-
       body: Column(
         children: [
-
           // ================= GAMBAR =================
           if (product!['image'] != null &&
               (product!['image'] as String).isNotEmpty) ...[
@@ -209,28 +221,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 margin: EdgeInsets.zero,
                 elevation: 2,
                 shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       // ===== INFO =====
                       infoRow("Nama Produk:", product!['name'] ?? '-'),
                       infoRow("Harga:", "Rp. ${product!['price'] ?? 0}"),
 
                       if (isParent) ...[
                         infoRow("Pack Size:", packSize.toString()),
-                        infoRow("Stok Satuan:", totalChildStock.toString()),
+                        infoRow(
+                            "Stok Satuan:", totalChildStock.toString()),
                         infoRow("Stok Pack:", totalPack.toString()),
                       ] else ...[
                         finalStockWidget(product!),
                       ],
 
                       // ===== DESKRIPSI CARD =====
-                      if ((product!['description'] ?? '').toString().isNotEmpty) ...[
+                      if ((product!['description'] ?? '')
+                          .toString()
+                          .isNotEmpty) ...[
                         const SizedBox(height: 10),
                         Card(
                           elevation: 1,
@@ -245,7 +260,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                               child: Text(
                                 product!['description'],
                                 textAlign: TextAlign.left,
-                                style: const TextStyle(fontSize: 14, height: 1.4),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  height: 1.4,
+                                ),
                               ),
                             ),
                           ),
@@ -258,21 +276,28 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           padding: EdgeInsets.symmetric(vertical: 6),
                           child: Text(
                             "Produk Satuan",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-
                         Expanded(
                           child: childProducts.isEmpty
-                              ? const Center(child: Text("Belum ada produk satuan."))
+                              ? const Center(
+                                  child: Text("Belum ada produk satuan."),
+                                )
                               : ListView.builder(
                                   itemCount: childProducts.length,
                                   itemBuilder: (context, i) {
                                     final c = childProducts[i];
-                                    final rawStock = c['stock_qty'] ?? 0;
-                                    final int cStock = (rawStock is num)
-                                        ? rawStock.toInt()
-                                        : int.parse(rawStock.toString());
+                                    final rawStock =
+                                        c['stock_qty'] ?? 0;
+                                    final int cStock =
+                                        (rawStock is num)
+                                            ? rawStock.toInt()
+                                            : int.parse(
+                                                rawStock.toString());
 
                                     return ListTile(
                                       title: Text(c['name'] ?? ''),
@@ -281,8 +306,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (_) => ProductDetailPage(
-                                              productId: c['id'] as int,
+                                            builder: (_) =>
+                                                ProductDetailPage(
+                                              productId:
+                                                  c['id'] as int,
                                             ),
                                           ),
                                         );
