@@ -50,7 +50,7 @@ class _TransactionHistoryPageState extends State<TransactionHistoryPage> {
 
                     String title;
                     if (isRefundEntry) {
-                      title = "Refund #${tx['id']} (dari #${tx['refund_from']})";
+                      title = "Transaksi #${tx['id']} (Refund Transaksi #${tx['refund_from']})";
                     } else {
                       title = "Transaksi #${tx['id']}";
                     }

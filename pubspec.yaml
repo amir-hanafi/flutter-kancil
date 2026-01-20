@@ -16,6 +16,8 @@ dependencies:
   url_launcher: ^6.3.0
   rename: ^3.1.0
   barcode_scan2: ^4.5.1
+  path_provider: ^2.0.15   # versi terbaru bisa dicek di pub.dev
+  file_picker: ^6.1.7
 
 dev_dependencies:
   flutter_test:

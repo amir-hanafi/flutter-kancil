@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kancil/database/db_helper.dart';
 import 'package:kancil/pages/edit_profile_page.dart';
+import 'package:kancil/pages/product_data_page.dart';
+
 
 class OtherPage extends StatefulWidget {
   const OtherPage({super.key});
@@ -120,7 +122,17 @@ class _OtherPageState extends State<OtherPage> {
 
                   const SizedBox(height: 12),
 
-                  Container(
+                  InkWell(
+                  onTap: () {
+                    // Navigasi ke halaman product_data.dart
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductDataPage(), // pastikan nama class sesuai
+                      ),
+                    );
+                  },
+                  child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -129,6 +141,8 @@ class _OtherPageState extends State<OtherPage> {
                     ),
                     child: const Text("Data produk"),
                   ),
+                ),
+
 
                   const SizedBox(height: 10),
 
